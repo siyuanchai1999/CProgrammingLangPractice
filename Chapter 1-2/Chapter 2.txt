@@ -1,0 +1,5 @@
+2.8 Increment & Decrement operators
+++n; increse before value is used
+n++; increased after the value is used
+
+n = 5;
