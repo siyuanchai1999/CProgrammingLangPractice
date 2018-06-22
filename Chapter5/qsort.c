@@ -1,61 +1,108 @@
 #include <stdio.h>
 #include <string.h>
 
+
 #define MAXLINES 1000
 #define MAXLEN 500
+#define ALLOCSIZE 1000
 
+static char allocbuf[ALLOCSIZE];
+static char *allocp = allocbuf;
+char *alloc(int n){
+	if(allocbuf + ALLOCSIZE - allocp >=n ){
+		allocp += n;
+		return allocp - n;
+	}else{
+		return 0;
+	}
+}
+
+void afree(char *p){
+	if(p>=allocbuf && p<allocbuf+ALLOCSIZE){
+		allocp = p;
+	}
+}
+
+
+void writeLines(char *linep[], int nlines);
 char *lineptr[MAXLINES];
-int getline(char s[], int lim){
+int getline(char *s, int lim){
 	int c,i;
 	i = 0;
 	while(--lim>0 && (c=getchar())!= EOF && c !='\n'){
-		s[i++] = c;
+		*s++ = c;
+		i++;
 	}
 	if(c == '\n') s[i++] = c;
-	s[i] = '\0'; //str terminator 
+	*s = '\0'; //str terminator 
 	return i;
 }
 
-int readlines(char *linep[], int max){
+int readlines(char *lineptr[], int max){
 	int len, nlines=0;
 	char *p, line[MAXLEN];
 	while((len = getline(line, MAXLEN)) >0){
-		printf("len:%d\n",len);
 		if(nlines>= max){
 			return -1;
 		}else{
 			line[len - 1] = '\0';
-			//p = line;
-			//strcpy(p,line);
-			printf("%s\n",line);
-			lineptr[nlines] = line;
-			printf("linep[%d]:%s\n",nlines,linep[nlines]);
-			//if(nlines==1) printf("linep[%d]:%s\n",nlines-1,linep[nlines-1]);
-			nlines++;
+			lineptr[nlines] = alloc(len);
+			strcpy(lineptr[nlines++],line);
 		}
+		//writeLines(lineptr,nlines);
 	}
 	return nlines;
 }
 
-void writelines(char *linep[], int nlines){
+void writeLines(char *linep[], int nlines){
 	int i;
+	printf("writeLines output:\n");
 	for(i=0; i<nlines;i++){
-		printf("line%d:%s\n",i,linep[i]);
+		printf("line%d: %s\n",i,linep[i]);
 	}
+	printf("writeLines output finished\n");
+	printf("-------------\n");
 }
 
+void swap(char *v[], int px, int py){
+	char *temp = v[px];
+	v[px] = v[py];
+	v[py] = temp;
+}
+
+int partition(char *v[], int start,int end){
+	char *pivot = v[end];
+	int i = start-1, j = start;
+	for(j = start;j<end;j++){
+		if(strcmp(v[j],pivot)<0){
+			swap(v,++i,j);
+		}
+	}
+	swap(v,i+1,end);
+	return i+1;
+}
+
+
+
 void qsort(char *v[], int left, int right){
+	if(left<right){
+		int x = partition(v,left,right);
+		qsort(v,left,x-1);
+		qsort(v,x+1 ,right);
+	}
 	
 }
 
 int main(){
 	int nlines;
 	if((nlines = readlines(lineptr, MAXLINES))>=0){
-		printf("nlines:%d\n", nlines);
-		printf("linep[0]:%s\n",lineptr[0]);
-		printf("linep[1]:%s\n",lineptr[1]);
-		//qsort(lineptr, 0,nlines);
-		writelines(lineptr,nlines);
+		printf("input before sort:\n");
+		writeLines(lineptr,nlines);
+		qsort(lineptr,0,nlines-1);
+		
+		printf("input after sort:\n");
+		writeLines(lineptr,nlines);
+		system("pause");
 		return 0;
 	}else{
 		printf("error: input too big");

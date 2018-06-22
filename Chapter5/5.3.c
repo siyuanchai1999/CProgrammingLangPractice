@@ -34,12 +34,10 @@ void afree(char *p){
 		allocp = p;
 	}
 }
-
+/** copy String t to String s**/
 void strcpy(char *s, char *t){
-	while((*s = *t) != '\0'){
-		s++;
-		t++;
-	}
+	while(*s++ = *t++ )
+		;
 }
 
 int strcmp(char *s, char *t){
@@ -50,7 +48,8 @@ int strcmp(char *s, char *t){
 	}
 	return *s -*t;
 }
-
+/**Exercise 5-3. Write a pointer version of the function strcat that we showed
+in Chapter 2: strca t (s ,t) copies the string t to the end of s.**/
 void strcat(char *s, char *t){
 	while(*s!='\0'){
 		s++;
@@ -63,6 +62,8 @@ void strcat(char *s, char *t){
 	*s = '\0';
 }
 
+/**Exercise 5-4. Write the function strend (s ,t ), which returns 1 if the string
+t occurs at the end of the string s, and zero otherwis**/
 int strend(char *s, char *t){
 	int t_len = 0;
 	while(*s != '\0'){
@@ -84,7 +85,6 @@ int main(){
 	char a[] = "jkl";
 	char b[] = "mkb";
 	char *c  = "abc";//read only declared in this way 
-	printf();
 	printf("b:%c  c:%c\n",*(b+2),*(c+2));
 	printf("b:%c  c:%c\n",*(b+3),*(c+3));
 	strcpy(b, c);
