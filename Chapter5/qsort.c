@@ -45,6 +45,7 @@ int readlines(char *lineptr[], int max){
 		if(nlines>= max){
 			return -1;
 		}else{
+			printf("len:%d",len);
 			line[len - 1] = '\0';
 			lineptr[nlines] = alloc(len);
 			strcpy(lineptr[nlines++],line);
