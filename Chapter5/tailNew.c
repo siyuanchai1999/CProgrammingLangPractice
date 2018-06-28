@@ -29,22 +29,22 @@ void writeLines(char *linep[], int nlines,int n){
 	printf("-------------\n");
 }
 
-static char allocbuf[ALLOCSIZE];
-static char *allocp = allocbuf;
-char *alloc(int n){
-	if(allocbuf + ALLOCSIZE - allocp >=n ){
-		allocp += n;
-		return allocp - n;
-	}else{
-		return 0;
+	static char allocbuf[ALLOCSIZE];
+	static char *allocp = allocbuf;
+	char *alloc(int n){
+		if(allocbuf + ALLOCSIZE - allocp >=n ){
+			allocp += n;
+			return allocp - n;
+		}else{
+			return 0;
+		}
 	}
-}
-
-void afree(char *p){
-	if(p>=allocbuf && p<allocbuf+ALLOCSIZE){
-		allocp = p;
+	
+	void afree(char *p){
+		if(p>=allocbuf && p<allocbuf+ALLOCSIZE){
+			allocp = p;
+		}
 	}
-}
 
 int charToInt(char *str){
 	int c,result = 0;

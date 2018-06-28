@@ -1,6 +1,7 @@
-#ifndef DEMO_H
-#define DEMO_H
+#include "demo.c"
 
-extern int foo(int a);
+#define MAX 500
 
-#endif
+int foo(int a);
+
+
