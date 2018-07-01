@@ -67,6 +67,7 @@ int main(int argc, char*argv[]){
 	int lineno = 0;
 	while(--argc >0 && (*++argv)[0] == '-'){
 		while(c = *++argv[0]){
+			printf("c:%c",c);
 			switch(c){
 				case 'x':
 					except = 1;
@@ -82,7 +83,7 @@ int main(int argc, char*argv[]){
 			}
 		}
 	}
-	printf("except:%d \t number:%d\n",except,number);
+	printf("except:%d \t number:%d\t argc:%d\n",except,number,argc);
 	if(argc	 != 1){
 		printf("Usage: find [-x] [-n] pattern\n");
 	}else{

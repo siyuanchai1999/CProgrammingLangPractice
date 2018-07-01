@@ -52,7 +52,7 @@ int getint(int *pn){
 		}
 	}
 	
-	int be
+	int be;
 	for(*pn = 0; isdigit(c) || c=='.'; c = getchar()){
 		*pn = 10 * (*pn) + (c - '0');
 	}
