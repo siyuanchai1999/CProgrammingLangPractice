@@ -1,0 +1,7 @@
+test output
+num = 4 	 nflag = 1 argc = 0
+Guanfu	Guangzhou	
+Shengjing	Shenyang	
+Tianhai	Tianjin	Tiantian	
+Zhenjiang	Zhenxin	
+done

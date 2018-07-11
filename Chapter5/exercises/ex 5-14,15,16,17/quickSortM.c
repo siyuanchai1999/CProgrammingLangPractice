@@ -1,6 +1,6 @@
 #include <stdio.h>
 #define width 3
-#define storageLen 18
+#define storageLen 30
 
  
 void swapM(int m[][width], int a, int b){

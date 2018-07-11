@@ -1,0 +1,4 @@
+x * int
+lineptr [] * char
+comp * () int
+l () * char

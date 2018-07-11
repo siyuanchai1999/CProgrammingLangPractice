@@ -124,13 +124,8 @@ void clearConList(int conList[],int pos){
 
 void showConList(int conList[]){
 	int i = 0;
-	while(i<18){
-		if(i<4 || i>=10){
-			printf("conList[%d]: %d\t",i,conList[i]);
-			if(i<4) printf("\t\t");
-		}else if(i == 5){
-			printf("\n");
-		}
+	while(i<storageLen){
+		if(conList[i] != -1) printf("conList[%d]: %d\t",i,conList[i]);
 		i++;
 	}
 	printf("\n");
@@ -198,7 +193,7 @@ int checkExp(int val,int check){
 int redoconList(int conList[], int infoTable[][width]){
 	int i,j =1,p;
 
-	for(i=10 ;i<18;i+=2){
+	for(i=10 ;i<storageLen;i+=2){
 		if(conList[i] != -1 && conList[i+1] != -1){
 			if(!(p = checkPreDef(infoTable,conList,i,j))){
 				//printf("not found: p = %d \t i=%d \t j=%d\n",p,i,j);
@@ -213,7 +208,7 @@ int redoconList(int conList[], int infoTable[][width]){
 			infoTable[0][0] = 1;
 		}	
 	}
-	//showMatrix(infoTable);
+//	showMatrix(infoTable);
 	return j;
 }
 
@@ -231,7 +226,7 @@ void initTable(int table[PARTITION][width], int conList[]){
 		table[i][width-1] = 0;
 	}
 
-	printf("initialization done\n");
+	//printf("initialization done\n");
 }
 
 int checkTableVal(int table[PARTITION][width],int conList[],int len){
@@ -279,21 +274,48 @@ void fixTable(int table[PARTITION][width], int nlines, int len){
 	}
 }
 
+void list2Str(char *str, int *list, int len){
+	int i = 0;
+	while(i<len){
+		if(*(list+i)){
+			if(i==0) *str++ = 'n';
+			else if(i==1) *str++ = 'r';
+			else if(i==2) *str++ = 'f';
+			else if(i==3) *str++ = 'd';
+		}
+		i++;
+	}
+	*str = '\0';
+}
 
 
 void superQsort(char *lineptr[], int table[PARTITION][width], int conList[], int nlines, int len){
 	int i,varNum = 4;
 	if(table[0][0]){
 		int *List = intAlloc(varNum);
+		char *para = alloc(varNum+1);
 		while(--len>0){
 			for(i = 0; i<varNum;i++){
 				List[i] = checkExp(table[len][2],i);
 			}
+			list2Str(para,List,varNum);
+			printf("qsort from %d to %d with parameter -%s\n",table[len][0],table[len][1],para);
 			quickSort(lineptr,table[len][0], table[len][1],List);
 		}
 		intFree(List);
 	}else{
-		quickSort(lineptr,0,nlines,conList);
+		int start = 0, end = nlines -1;
+		for(i = 4; i<storageLen && conList[i] != -1 && conList[i+1] != -1;i +=2){
+			start = conList[i];
+			end   = conList[i+1];
+			printf("going qsort from %d to %d\n",start, end);
+			quickSort(lineptr,start,end,conList);
+		}
+		if(start == 0 && end == nlines -1){
+			printf("going qsort from %d to %d\n",start, end);
+			quickSort(lineptr,start,end,conList);
+		}
+
 	}
 }
 
@@ -312,24 +334,56 @@ int tryFindPos(char *str, int conList[], int para){
 		printf("err parameters: %c\n",*str);
 		return -1;
 	}
-	if(start<= end){
-		conList[2*para+10] = start;
+	if(start<= end && para <4){
+		conList[2*para+10] = start;  //specific option field
 		conList[2*para+11] = end;
-	}else {
+	}else if(start<= end && para >= 4 && para < storageLen-1){
+		conList[para] = start;
+		conList[para+1] = end;
+	}else if(para >= storageLen){
+		printf("err: exceed max num of partition!!\n");
 		return -1;
 	}
 	return para;
 }
 
+int checkEmpty(int conList[]){
+	int i = 0;
+	for(i = 0;i<storageLen;i++){
+		//printf("i = %d\t",i);
+		if(conList[i] != ((i<4)? 0:-1)) return 0; 
+		i = (i==3)? 9:i;
+	}
+	return 1;
+}
+
+int findPara(int conList[]){
+	int i = 4;
+	while(conList[i] != -1 && conList[i+1] != -1){
+		i += 2;
+		if(i == 10) i = 18;
+	}
+	return i;
+}
+
+/****
+conList [0] = numeric;     [10] = numeric startPos,   [11] numeric endPos
+		[1] = reverse;	   [12] = reverse startPos,   [13] reverse endPos
+		[2] = fold;	 	   [14] = fold startPos,      [15] fold endPos
+		[3] = directory;   [16] = directory startPos, [17] directory endPos
+		[4] = normal startPos, [5] = normal endPos
+
+*/
+
 int main(int argc, char *argv[]){
 	int nlines, numeric = 0, reverse = 0,fold = 0,directory = 0,c,found=-1;
 	int *conList = intAlloc(storageLen);
 	for(c = 0;c<storageLen;c++){ //initialize the conlist
-		conList[c] = -1;
+		conList[c] = (c<4)? 0:-1;
 	}
 	while(--argc>0   &&   (((c = *(*++argv))== '-') || isdigit(c))){ //equivalent to (*++argv)[0]
 		while( (c = (isdigit(c)) ? c:*(*argv)++ ) && found == -1){  //if c is digit just get itself; if not get -f or -n stuff
-			//printf("c:%c\n",c);
+			//printf("c:%c\t found = %d\n",c,found);
 			switch(c){
 				case '-':
 					//nothing all is right;
@@ -354,14 +408,19 @@ int main(int argc, char *argv[]){
 					break;
 				default:
 					if(isdigit(c)){
+					//showConList(conList);
 						for(c=0;c<4;c++){
-								if(conList[c] && found == -1){
+								if(conList[c]  && found == -1){
 									found = tryFindPos(*argv,conList,c);
 								}else if(conList[c] && found != -1){  //not bother to go throught the loop again!!
 									conList[2*c + 10] = conList[2*found + 10];
 									conList[2*c + 11] = conList[2*found + 11];
 								}
-							}
+						}
+						if(checkEmpty(conList))
+							//printf("empty!!!\n");
+							found = tryFindPos(*argv,conList,findPara(conList));
+						
 						break;
 					}else{
 						printf("illegal parameters: %c\n",c);
@@ -385,7 +444,7 @@ int main(int argc, char *argv[]){
 	
 	int infoTable[PARTITION][width];
 	initTable(infoTable,conList);
-	showConList(conList);
+	//showConList(conList);
 	int partLen = redoconList(conList,infoTable);
 	
 	if(argc<0){

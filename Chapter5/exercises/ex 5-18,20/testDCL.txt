@@ -1,0 +1,4 @@
+int *p
+char *lineptr[13]
+int *foo(int c, char p)
+int bar(int q, int foo())

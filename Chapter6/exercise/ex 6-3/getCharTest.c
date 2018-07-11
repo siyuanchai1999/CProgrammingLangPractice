@@ -1,10 +1,10 @@
 #include <stdio.h>
 #define BUFFERSIZE 1000
-char buffer[BUFFERSIZE];
+char buff[BUFFERSIZE];
 int bufp = 0;
 int getch(){
 	if(bufp>0){
-		return buffer[--bufp];
+		return buff[--bufp];
 	}else{
 		return getchar();
 	}
@@ -15,8 +15,16 @@ int ungetch(char c){
 		printf("ERROR: too many characters\n");
 		return -1;
 	}else{
-		buffer[bufp++] = c;
+		//printf("push %d %c ")
+		buff[bufp++] = c;
 		return c;
 	}
 }
+/*
+int main(){
+	int c;
+	while((c = getch())!= EOF){
+		printf("c: %d %c  ",c,c);
+	}
+}*/
 
