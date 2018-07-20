@@ -1,11 +1,22 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define MAXLINE 1000
 #define MAXLINES 500
 #define ALLOCSIZE 1000
+#define MAXFILE 10
 
+/*
+find pattern from files or stdin
 
+*/
+struct file{
+	char *name;
+	FILE *fptr;
+};
+
+static struct file *fileArr[MAXFILE];
 
 int getline(char *s, int lim){
 	int c,i;
@@ -46,7 +57,7 @@ void afree(char *p){
 	}
 }
 
-char *itoa(int num,char *str){
+char *pitoa(int num,char *str){
 
 	while(num>0){
 		*str++ = num %10 +48;
@@ -59,12 +70,21 @@ char *itoa(int num,char *str){
 	return str;
 }
 
+void outputfiles(int len){
+	int i;
+	for(i = 0; i<len;i++){
+		printf("%d\t%s\n",i,fileArr[i]->name);
+	}
+}
+
 int main(int argc, char*argv[]){
+	FILE *fp;
 	char *lineptr[MAXLINES];
 	char lineNum[100];
 	char line[MAXLINE];
+	char *pattern,*prog = *argv;
 	int found = 0, except = 0, number = 0,c;
-	int lineno = 0;
+	int lineno = 0, filenum = 0;
 	while(--argc >0 && (*++argv)[0] == '-'){
 		while(c = *++argv[0]){
 			printf("c:%c",c);
@@ -85,6 +105,25 @@ int main(int argc, char*argv[]){
 	}
 	printf("except:%d \t number:%d\t argc:%d\n",except,number,argc);
 	
+	if(argc < 1){
+		printf("usage: find [-n][-x] pattern [files...]\n");
+	}else{
+		pattern = *argv++;
+		printf("pattern = %s\n",pattern);
+		while(argc-- > 0){
+			if((fp = fopen(*argv,"r")) != NULL){
+				fileArr[filenum] = (struct file *) malloc(sizeof(struct file));
+				fileArr[filenum]->fptr = fp;
+				fileArr[filenum++]->name = *argv++;
+			}else{
+				printf("%s: cannot find %s\n",prog,*argv++);
+			}
+		}
+		outputfiles(filenum);
+		
+	}
+	
+	/*
 	if(argc	 != 1){
 		printf("Usage: find [-x] [-n] pattern\n");
 	}else{
@@ -97,12 +136,10 @@ int main(int argc, char*argv[]){
 					strcpy(line,lineNum);
 				}
 				lineptr[found] = alloc(strlen(line)+1);
-//				printf("%s %d %d\n",line,strlen(line),*(line+strlen(line)));
 				strcpy(lineptr[found++],line);
-				//printf("found ++\n");
 			}
 		}
 		writeLines(lineptr,found);
-	}
+	}*/
 	return found;
 }
