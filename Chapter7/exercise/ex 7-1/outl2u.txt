@@ -1,0 +1,8 @@
+u2l = 1
+beijing 
+huanying
+ni
+beijing 2008
+london 2012
+rio 2016
+tokyo 2020

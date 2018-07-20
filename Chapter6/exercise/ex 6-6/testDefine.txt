@@ -1,0 +1,7 @@
+
+#define HASHSIZE 101
+#define MAXWORD 50
+
+#def MAX 1000
+#define INTT 999
+#define JJJ -20
