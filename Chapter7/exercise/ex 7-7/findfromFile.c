@@ -16,28 +16,52 @@ struct file{
 	FILE *fptr;
 };
 
-static struct file *fileArr[MAXFILE];
+struct lineinfo{
+	int linen;
+	char *line;
+	char *fname;
+};
 
-int getline(char *s, int lim){
-	int c,i;
-	i = 0;
-	while(--lim>0 && (c=getchar())!= EOF && c !='\n'){
-		*s++ = c;
-		i++;
+static struct file *fileArr[MAXFILE];
+static struct lineinfo *lineArr[MAXLINES];
+int Strcpy(char *dest, char *src){
+	int len = 0;
+	while(*dest++ = *src++)
+		len++;
+	*dest = '\0';
+	return len;
+}
+char *fgetline(char *str, int max, FILE *ip){
+	int c;
+	char *s = str;
+	
+	while(--max > 0 && (c = getc(ip)) != EOF){
+		if( c == '\n'){
+			break;
+		}else{
+			*s++ = c;
+		}
 	}
-	if(c == '\n') s[i++] = c;
-	*s = '\0'; //str terminator 
-	return i;
+	*s = '\0';
+	return (c == EOF && s == str) ? NULL : str;  		//all characters has been read
 }
 
-void writeLines(char *linep[], int nlines){
+void writeLines(int len, int number){
 	int i;
-	printf("writeLines output:\n");
-	for(i=0; i<nlines;i++){
-		printf("%s\n",linep[i],*(linep[i]+10));
+	char *pre = NULL;
+	printf("filename  \t");
+	if(number) printf(" linenum \t");
+	printf(" content\n");
+	
+	for(i= 0;i<len;i++){
+		if(lineArr[i]->fname != pre){
+			printf("%-10s\t ",pre = lineArr[i]->fname);
+		}else{
+			printf("          \t ");
+		}
+		if(number) printf("%-9d\t ",lineArr[i]->linen);
+		printf("%s\n",lineArr[i]->line);
 	}
-	printf("writeLines output finished\n");
-	printf("-------------\n");
 }
 
 static char allocbuf[ALLOCSIZE];
@@ -57,19 +81,6 @@ void afree(char *p){
 	}
 }
 
-char *pitoa(int num,char *str){
-
-	while(num>0){
-		*str++ = num %10 +48;
-		num = num/10;
-	}
-	*str++ = ' ';
-	*str++ = ':';
-	*str++ = ' ';
-	*str = '\0';
-	return str;
-}
-
 void outputfiles(int len){
 	int i;
 	for(i = 0; i<len;i++){
@@ -79,15 +90,14 @@ void outputfiles(int len){
 
 int main(int argc, char*argv[]){
 	FILE *fp;
-	char *lineptr[MAXLINES];
-	char lineNum[100];
 	char line[MAXLINE];
+	
 	char *pattern,*prog = *argv;
 	int found = 0, except = 0, number = 0,c;
 	int lineno = 0, filenum = 0;
 	while(--argc >0 && (*++argv)[0] == '-'){
 		while(c = *++argv[0]){
-			printf("c:%c",c);
+			//printf("c:%c",c);
 			switch(c){
 				case 'x':
 					except = 1;
@@ -109,8 +119,8 @@ int main(int argc, char*argv[]){
 		printf("usage: find [-n][-x] pattern [files...]\n");
 	}else{
 		pattern = *argv++;
-		printf("pattern = %s\n",pattern);
-		while(argc-- > 0){
+		//printf("pattern = %s\n",pattern);
+		while(--argc > 0){
 			if((fp = fopen(*argv,"r")) != NULL){
 				fileArr[filenum] = (struct file *) malloc(sizeof(struct file));
 				fileArr[filenum]->fptr = fp;
@@ -119,27 +129,36 @@ int main(int argc, char*argv[]){
 				printf("%s: cannot find %s\n",prog,*argv++);
 			}
 		}
-		outputfiles(filenum);
+		
+		//printf("files paramater done\n");
+		if(filenum == 0){
+			char str2[6] = "stdin";
+			fileArr[filenum] = (struct file *) malloc(sizeof(struct file));
+			fileArr[filenum]->fptr = stdin;
+			fileArr[filenum]->name = alloc(strlen(str2)+1);
+			Strcpy(fileArr[filenum++]->name,str2);
+			printf("sdtin assigned\n");
+		}
+		//outputfiles(filenum);
+		int i = 0;
+		while(i<filenum){
+			lineno = 0;
+			while(fgetline(line,MAXLINE,fileArr[i]->fptr) != NULL){
+				lineno++;
+				if(found < MAXLINES && (strstr(line,pattern) != NULL) != except){
+					lineArr[found]= (struct lineinfo *) malloc(sizeof(struct lineinfo));
+					lineArr[found]->linen = lineno;
+					lineArr[found]->fname = fileArr[i]->name;
+					lineArr[found]->line  = (char *) malloc(strlen(line)+1);
+					strcpy(lineArr[found++]->line,line);
+				}
+			}
+			fclose(fileArr[i++]->fptr);
+		}
+		writeLines(found,number);
 		
 	}
 	
-	/*
-	if(argc	 != 1){
-		printf("Usage: find [-x] [-n] pattern\n");
-	}else{
-		while(getline(line,MAXLINE) >0 ){
-			lineno++;
-			if( (strstr(line,*argv) != NULL) != except){
-				if(number){
-					itoa(lineno,lineNum);
-					strcat(lineNum,line);
-					strcpy(line,lineNum);
-				}
-				lineptr[found] = alloc(strlen(line)+1);
-				strcpy(lineptr[found++],line);
-			}
-		}
-		writeLines(lineptr,found);
-	}*/
+
 	return found;
 }
