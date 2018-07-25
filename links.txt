@@ -1,5 +1,0 @@
-#temporary links for ubuntu installation
-
-https://itsfoss.com/no-grub-windows-linux/
-
-https://help.ubuntu.com/community/Boot-Repair
