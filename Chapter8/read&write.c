@@ -1,6 +1,6 @@
 #include <stdio.h>
-
+#include <fcntl.h>
+int fd;
 int main(){
-	byte a = 4;
-	printf("%d",a);
+	
 }
