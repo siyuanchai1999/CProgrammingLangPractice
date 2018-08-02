@@ -1,0 +1,42 @@
+ 驱动器 D 中的卷没有标签。
+ 卷的序列号是 0005-2096
+
+ D:\C++\The C programming language\CProgrammingLangPractice\Chapter8 的目录
+
+2018/07/29  22:56    <DIR>          .
+2018/07/29  22:56    <DIR>          ..
+2018/07/29  22:56                 0 alog.txt
+2018/07/26  23:44                18 blog.txt
+2018/07/26  20:03               802 copy.c
+2018/07/26  16:30               757 copy.c.save
+2018/07/26  20:03           132,720 copy.exe
+2018/07/26  18:36             8,624 copy.o
+2018/07/26  15:42             8,624 copy.out
+2018/07/27  11:17    <DIR>          exercise
+2018/07/29  22:56               260 fcopy.c
+2018/07/29  22:56           131,347 fcopy.exe
+2018/07/29  22:46    <DIR>          fopen_imple
+2018/07/27  00:34             2,551 lseek.c
+2018/07/27  00:34           134,153 lseek.exe
+2018/07/27  10:13            12,896 lseek.o
+2018/07/23  10:45                68 read&write.c
+2018/07/23  10:45           130,809 read&write.exe
+2018/07/27  00:27               255 read.c
+2018/07/27  00:27           132,034 read.exe
+2018/07/26  12:44             8,384 read.out
+              17 个文件        704,302 字节
+               4 个目录 48,900,231,168 可用字节
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+#define BUFSIZE 100
+int main(int argc, char *argv[]){
+	char c;
+	int n = open(*++argv,O_RDWR,0);
+	lseek(n,12,0);
+	while(read(n,&c,1)> 0){
+		printf("c = %d %c\n",c,c);
+	}
+	return 0;
+}
