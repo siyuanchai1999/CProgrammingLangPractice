@@ -280,3 +280,17 @@ int main(int argc, char *argv[]){
 	return 0;
 
 }
+/*
+ * timing result of bit field implementation
+ * copy 10000 entries to dest file
+	real	0m8.107s
+	user	0m0.162s
+	sys	0m2.591s
+
+ * timing result of odinary implementation
+ * copy 10000 entries to dest file
+	real	0m8.135s
+	user	0m0.227s
+	sys	0m2.530s
+ approximately the same
+*/
