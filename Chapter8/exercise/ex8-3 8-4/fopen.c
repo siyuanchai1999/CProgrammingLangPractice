@@ -216,11 +216,13 @@ int main(int argc, char *argv[]){
 	char c;
 	
 	while((c = getc(fp1)) != EOF){
-		if(c == '\n') FSEEK(fp1,4L,0);
-		putc(c, stdout);
+		//if(c == '\n') FSEEK(fp1,4L,0);
+		putc(c,fp2);
 	}
 	
-	fflush(stdout);
+	fflush(fp2);
+	FCLOSE(fp2);
+	FCLOSE(fp1);
  
 	return 0;
 
